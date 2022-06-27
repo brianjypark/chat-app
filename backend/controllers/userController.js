@@ -3,7 +3,7 @@ const generateToken = require("../config/generateToken");
 const User = require("../models/userModel");
 
 const registerUser = asyncHandler(async (request, response) => {
-  const { name, email, password, pic } = request.body;
+  const { name, email, password, picture } = request.body;
 
   if (!name || !email || !password) {
     response.status(400);
@@ -21,7 +21,7 @@ const registerUser = asyncHandler(async (request, response) => {
     name,
     email,
     password,
-    pic,
+    picture,
   });
 
   if (user) {
@@ -54,4 +54,19 @@ const authUser = asyncHandler(async (request, response) => {
   }
 });
 
-module.exports = { registerUser, authUser };
+const allUsers = asyncHandler(async (request, response) => {
+  const keyword = request.query.search
+    ? {
+        $or: [
+          { name: { $regex: request.query.search, $options: "i" } },
+          { email: { $regex: request.query.search, $options: "i" } },
+        ],
+      }
+    : {};
+  const users = await User.find(keyword).find({
+    _id: { $ne: request.user._id },
+  });
+  response.send(users);
+});
+
+module.exports = { registerUser, authUser, allUsers };
