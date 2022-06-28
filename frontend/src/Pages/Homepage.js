@@ -20,6 +20,7 @@ const Homepage = () => {
     const userInfo = JSON.parse(localStorage.getItem("user"));
 
     if (userInfo) {
+      console.log("pushed to /chats by history");
       history.push("/chats");
     }
   }, [history]);
